@@ -73,10 +73,142 @@ export async function loginBrowser(): Promise<string> {
     openBrowser: async (url: string) => {
       await open(url);
     },
-    successTemplate:
-      '<h3 style="font-family:sans-serif">Authentication complete. You may close this tab.</h3>',
-    errorTemplate:
-      '<h3 style="font-family:sans-serif">Authentication failed: {error}. You may close this tab.</h3>',
+    successTemplate: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>azd — authenticated</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 48px 56px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+    .icon {
+      width: 56px;
+      height: 56px;
+      background: #1f6feb22;
+      border: 1px solid #1f6feb66;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 28px;
+    }
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+    p  { font-size: 14px; color: #8b949e; line-height: 1.5; }
+    .badge {
+      display: inline-block;
+      margin-top: 24px;
+      background: #1f6feb22;
+      border: 1px solid #1f6feb66;
+      color: #58a6ff;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✓</div>
+    <h1>Authentication successful</h1>
+    <p>You are now logged in to Azure DevOps.<br>You may close this tab and return to your terminal.</p>
+    <span class="badge">azd cli</span>
+  </div>
+</body>
+</html>`,
+    errorTemplate: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>azd — authentication failed</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 48px 56px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+    .icon {
+      width: 56px;
+      height: 56px;
+      background: #f8514922;
+      border: 1px solid #f8514966;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 28px;
+    }
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+    p  { font-size: 14px; color: #8b949e; line-height: 1.5; }
+    .error {
+      margin-top: 16px;
+      background: #f8514911;
+      border: 1px solid #f8514944;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #ff7b72;
+      font-family: ui-monospace, monospace;
+      word-break: break-all;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 24px;
+      background: #f8514922;
+      border: 1px solid #f8514966;
+      color: #ff7b72;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✗</div>
+    <h1>Authentication failed</h1>
+    <p>Something went wrong during sign-in.<br>Close this tab and try <code>azd auth login</code> again.</p>
+    <div class="error">{error}</div>
+    <span class="badge">azd cli</span>
+  </div>
+</body>
+</html>`,
   });
 
   return result.accessToken;
