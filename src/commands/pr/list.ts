@@ -12,8 +12,23 @@ async function prListHandler(options: {
   project?: string;
   org?: string;
   json?: string | boolean;
+  web?: boolean;
 }): Promise<void> {
   const config = getConfig({ orgUrl: options.org, project: options.project });
+
+  if (options.web) {
+    const { getWebApi: _getWebApi } = await import('../../api/client.js');
+    const { resolveRepo } = await import('../../api/pullRequests.js');
+    const connection = await _getWebApi(config.orgUrl);
+    const repoName = await resolveRepo(connection, config.project, options.repo).catch(() => undefined);
+    const url = repoName
+      ? `${config.orgUrl}/${encodeURIComponent(config.project)}/_git/${encodeURIComponent(repoName)}/pullrequests`
+      : `${config.orgUrl}/${encodeURIComponent(config.project)}/_pulls`;
+    const openMod = await import('open');
+    await openMod.default(url);
+    return;
+  }
+
   const connection = await getWebApi(config.orgUrl);
 
   const prs = await listPullRequests(connection, config.project, {
@@ -58,5 +73,6 @@ export function registerPrList(prCmd: Command): void {
     .option('-p, --project <project>', 'Azure DevOps project (overrides config)')
     .option('--org <url>', 'Azure DevOps organization URL (overrides config)')
     .option('--json [fields]', 'Output as JSON (optional comma-separated fields)')
+    .option('-w, --web', 'Open in browser')
     .action(prListHandler);
 }

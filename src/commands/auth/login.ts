@@ -4,6 +4,8 @@ import { savePatToken, saveOAuthCredential } from '../../auth/store.js';
 import { loginBrowser, loginDeviceCode } from '../../auth/oauth.js';
 import { saveConfigFile } from '../../config/index.js';
 import { AzdError } from '../../errors/index.js';
+import { registerAuthStatus } from './status.js';
+import { registerAuthLogout } from './logout.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -81,9 +83,21 @@ async function validateAndSave(
         defaultProject = projects[0].name ?? undefined;
       } else if (projects && projects.length > 1) {
         process.stdout.write('\nAvailable projects:\n');
-        projects.forEach((p) => process.stdout.write(`  ${p.name}\n`));
-        const answer = await promptLine('\nDefault project name (leave blank to skip): ');
-        if (answer) defaultProject = answer;
+        if (process.stdout.isTTY) {
+          projects.forEach((p, i) => process.stdout.write(`  ${i + 1}. ${p.name}\n`));
+          const answer = await promptLine(`\nSelect project (1-${projects.length}) or press Enter to skip: `);
+          const idx = parseInt(answer, 10);
+          if (!isNaN(idx) && idx >= 1 && idx <= projects.length) {
+            defaultProject = projects[idx - 1].name ?? undefined;
+          } else if (answer && isNaN(idx)) {
+            // User typed a project name directly
+            defaultProject = answer;
+          }
+        } else {
+          projects.forEach((p) => process.stdout.write(`  ${p.name}\n`));
+          const answer = await promptLine('\nDefault project name (leave blank to skip): ');
+          if (answer) defaultProject = answer;
+        }
       }
     } catch {
       // Non-fatal — user can set project later via --project flag or env var
@@ -184,6 +198,9 @@ async function loginHandler(options: {
 
 export function registerAuthCommands(program: Command): void {
   const auth = program.command('auth').description('Authenticate with Azure DevOps');
+
+  registerAuthStatus(auth);
+  registerAuthLogout(auth);
 
   auth
     .command('login')

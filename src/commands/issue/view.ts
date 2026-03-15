@@ -22,7 +22,7 @@ function stripHtml(html: string): string {
 
 async function issueViewHandler(
   id: string,
-  options: { project?: string; org?: string; json?: string | boolean; comments?: boolean }
+  options: { project?: string; org?: string; json?: string | boolean; comments?: boolean; web?: boolean }
 ): Promise<void> {
   const numId = parseInt(id, 10);
   if (isNaN(numId)) {
@@ -31,6 +31,14 @@ async function issueViewHandler(
   }
 
   const config = getConfig({ orgUrl: options.org, project: options.project });
+
+  if (options.web) {
+    const url = `${config.orgUrl}/${encodeURIComponent(config.project)}/_workitems/edit/${numId}`;
+    const openMod = await import('open');
+    await openMod.default(url);
+    return;
+  }
+
   const connection = await getWebApi(config.orgUrl);
   const { item, comments } = await getWorkItem(connection, config.project, numId, options.comments ?? false);
 
@@ -77,5 +85,6 @@ export function registerIssueView(issueCmd: Command): void {
     .option('--org <url>', 'Azure DevOps organization URL (overrides config)')
     .option('--comments', 'Show comments')
     .option('--json [fields]', 'Output as JSON (optional comma-separated fields)')
+    .option('-w, --web', 'Open in browser')
     .action(issueViewHandler);
 }

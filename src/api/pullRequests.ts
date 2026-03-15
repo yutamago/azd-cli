@@ -350,6 +350,81 @@ export function buildPrWebUrl(orgUrl: string, project: string, repoName: string,
   return buildPrUrl(orgUrl, project, repoName, prId);
 }
 
+export async function createPullRequest(
+  connection: azdev.WebApi,
+  project: string,
+  repoName: string,
+  options: {
+    title: string;
+    description?: string;
+    sourceBranch: string;
+    targetBranch: string;
+    isDraft?: boolean;
+    reviewerNames?: string[];
+  }
+): Promise<PrSummary> {
+  const gitApi = await connection.getGitApi();
+  const orgUrl = (connection as unknown as { _serverUrl: string })._serverUrl ?? '';
+
+  try {
+    const pr = await gitApi.createPullRequest(
+      {
+        title: options.title,
+        description: options.description ?? '',
+        sourceRefName: `refs/heads/${options.sourceBranch}`,
+        targetRefName: `refs/heads/${options.targetBranch}`,
+        isDraft: options.isDraft ?? false,
+      },
+      repoName,
+      project,
+    );
+
+    return {
+      id: pr.pullRequestId ?? 0,
+      title: pr.title ?? '',
+      author: pr.createdBy?.displayName ?? '',
+      status: prStatusToString(pr.status),
+      sourceBranch: cleanBranch(pr.sourceRefName ?? ''),
+      targetBranch: cleanBranch(pr.targetRefName ?? ''),
+      repo: pr.repository?.name ?? repoName,
+      updatedAt: String(pr.creationDate ?? ''),
+      url: buildPrUrl(orgUrl, project, pr.repository?.name ?? repoName, pr.pullRequestId ?? 0),
+      isDraft: pr.isDraft ?? false,
+    };
+  } catch (err) {
+    handleApiError(err, 'Pull request');
+  }
+}
+
+export async function reviewPullRequest(
+  connection: azdev.WebApi,
+  project: string,
+  repoName: string,
+  prId: number,
+  vote: number
+): Promise<void> {
+  const gitApi = await connection.getGitApi();
+
+  try {
+    // Get current user identity
+    const connData = await connection.connect();
+    const userId = connData?.authenticatedUser?.id;
+    if (!userId) {
+      throw new AzdError('Could not determine current user identity.');
+    }
+
+    await gitApi.createPullRequestReviewer(
+      { vote },
+      repoName,
+      prId,
+      userId,
+      project,
+    );
+  } catch (err) {
+    handleApiError(err, `PR #${prId}`);
+  }
+}
+
 export async function resolveRepo(
   connection: azdev.WebApi,
   project: string,

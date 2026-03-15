@@ -2,6 +2,93 @@ import * as azdev from 'azure-devops-node-api';
 import { WorkItemExpand } from 'azure-devops-node-api/interfaces/WorkItemTrackingInterfaces.js';
 import { handleApiError } from '../errors/index.js';
 
+export async function createWorkItem(
+  connection: azdev.WebApi,
+  project: string,
+  type: string,
+  fields: { title: string; description?: string; assignee?: string; tags?: string }
+): Promise<WorkItemSummary> {
+  const witApi = await connection.getWorkItemTrackingApi();
+  const orgUrl = (connection as unknown as { _serverUrl: string })._serverUrl ?? '';
+
+  const doc = [
+    { op: 'add' as const, path: '/fields/System.Title', value: fields.title },
+    ...(fields.description ? [{ op: 'add' as const, path: '/fields/System.Description', value: fields.description }] : []),
+    ...(fields.assignee ? [{ op: 'add' as const, path: '/fields/System.AssignedTo', value: fields.assignee }] : []),
+    ...(fields.tags ? [{ op: 'add' as const, path: '/fields/System.Tags', value: fields.tags }] : []),
+  ];
+
+  try {
+    const wi = await witApi.createWorkItem({} as Record<string, string>, doc, project, type);
+    const f = wi.fields ?? {};
+    return {
+      id: wi.id ?? 0,
+      type: String(f['System.WorkItemType'] ?? type),
+      title: String(f['System.Title'] ?? fields.title),
+      state: String(f['System.State'] ?? ''),
+      assignee: String((f['System.AssignedTo'] as { displayName?: string } | undefined)?.displayName ?? f['System.AssignedTo'] ?? ''),
+      tags: String(f['System.Tags'] ?? ''),
+      updatedAt: String(f['System.ChangedDate'] ?? ''),
+      url: buildOrgUrl(orgUrl, project, wi.id ?? 0),
+    };
+  } catch (err) {
+    handleApiError(err, 'Work item');
+  }
+}
+
+export async function patchWorkItem(
+  connection: azdev.WebApi,
+  project: string,
+  id: number,
+  fields: Record<string, string>
+): Promise<WorkItemSummary> {
+  const witApi = await connection.getWorkItemTrackingApi();
+  const orgUrl = (connection as unknown as { _serverUrl: string })._serverUrl ?? '';
+
+  const doc = Object.entries(fields).map(([path, value]) => ({
+    op: 'add' as const,
+    path: `/fields/${path}`,
+    value,
+  }));
+
+  try {
+    const wi = await witApi.updateWorkItem({} as Record<string, string>, doc, id, project);
+    const f = wi.fields ?? {};
+    return {
+      id: wi.id ?? id,
+      type: String(f['System.WorkItemType'] ?? ''),
+      title: String(f['System.Title'] ?? ''),
+      state: String(f['System.State'] ?? ''),
+      assignee: String((f['System.AssignedTo'] as { displayName?: string } | undefined)?.displayName ?? f['System.AssignedTo'] ?? ''),
+      tags: String(f['System.Tags'] ?? ''),
+      updatedAt: String(f['System.ChangedDate'] ?? ''),
+      url: buildOrgUrl(orgUrl, project, wi.id ?? id),
+    };
+  } catch (err) {
+    handleApiError(err, `Work item #${id}`);
+  }
+}
+
+export async function addWorkItemComment(
+  connection: azdev.WebApi,
+  project: string,
+  id: number,
+  text: string
+): Promise<void> {
+  const witApi = await connection.getWorkItemTrackingApi();
+  try {
+    // Add comment via System.History field (discussion)
+    await witApi.updateWorkItem(
+      {} as Record<string, string>,
+      [{ op: 'add' as const, path: '/fields/System.History', value: text }],
+      id,
+      project,
+    );
+  } catch (err) {
+    handleApiError(err, `Work item #${id}`);
+  }
+}
+
 export interface WorkItemSummary {
   id: number;
   type: string;

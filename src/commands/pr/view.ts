@@ -1,12 +1,12 @@
 import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
-import { getPullRequest, resolveRepo } from '../../api/pullRequests.js';
+import { getPullRequest, resolveRepo, buildPrWebUrl } from '../../api/pullRequests.js';
 import { getConfig } from '../../config/index.js';
 import { outputDetail, outputJson, relativeDate, colorPrState } from '../../output/index.js';
 
 async function prViewHandler(
   prId: string,
-  options: { repo?: string; project?: string; org?: string; json?: string | boolean; comments?: boolean }
+  options: { repo?: string; project?: string; org?: string; json?: string | boolean; comments?: boolean; web?: boolean }
 ): Promise<void> {
   const numId = parseInt(prId, 10);
   if (isNaN(numId)) {
@@ -15,6 +15,16 @@ async function prViewHandler(
   }
 
   const config = getConfig({ orgUrl: options.org, project: options.project });
+
+  if (options.web) {
+    const connection = await getWebApi(config.orgUrl);
+    const repoName = await resolveRepo(connection, config.project, options.repo);
+    const url = buildPrWebUrl(config.orgUrl, config.project, repoName, numId);
+    const openMod = await import('open');
+    await openMod.default(url);
+    return;
+  }
+
   const connection = await getWebApi(config.orgUrl);
   const repoName = await resolveRepo(connection, config.project, options.repo);
   const { pr, threads } = await getPullRequest(connection, config.project, repoName, numId, options.comments ?? false);
@@ -59,5 +69,6 @@ export function registerPrView(prCmd: Command): void {
     .option('--org <url>', 'Azure DevOps organization URL (overrides config)')
     .option('--comments', 'Show review comments and threads')
     .option('--json [fields]', 'Output as JSON (optional comma-separated fields)')
+    .option('-w, --web', 'Open in browser')
     .action(prViewHandler);
 }

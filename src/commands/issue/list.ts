@@ -13,8 +13,17 @@ async function issueListHandler(options: {
   org?: string;
   json?: string | boolean;
   type?: string;
+  web?: boolean;
 }): Promise<void> {
   const config = getConfig({ orgUrl: options.org, project: options.project });
+
+  if (options.web) {
+    const url = `${config.orgUrl}/${encodeURIComponent(config.project)}/_workitems`;
+    const openMod = await import('open');
+    await openMod.default(url);
+    return;
+  }
+
   const connection = await getWebApi(config.orgUrl);
 
   const items = await listWorkItems(connection, config.project, {
@@ -70,5 +79,6 @@ export function registerIssueList(issueCmd: Command): void {
     .option('-p, --project <project>', 'Azure DevOps project (overrides config)')
     .option('--org <url>', 'Azure DevOps organization URL (overrides config)')
     .option('--json [fields]', 'Output as JSON (optional comma-separated fields)')
+    .option('-w, --web', 'Open in browser')
     .action(issueListHandler);
 }

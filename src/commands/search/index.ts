@@ -4,6 +4,7 @@ import { registerSearchCode } from './code.js';
 import { registerSearchCommits } from './commits.js';
 import { registerSearchPrs } from './prs.js';
 import { registerSearchRepos } from './repos.js';
+import { registerSearchProjects } from './projects.js';
 
 export function registerSearchCommands(program: Command): void {
   const search = program.command('search').description('Search across Azure DevOps');
@@ -12,4 +13,5 @@ export function registerSearchCommands(program: Command): void {
   registerSearchCommits(search);
   registerSearchPrs(search);
   registerSearchRepos(search);
+  registerSearchProjects(search);
 }

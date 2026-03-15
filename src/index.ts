@@ -16,6 +16,9 @@ import { registerAuthCommands } from './commands/auth/login.js';
 import { registerIssueCommands } from './commands/issue/index.js';
 import { registerPrCommands } from './commands/pr/index.js';
 import { registerSearchCommands } from './commands/search/index.js';
+import { registerRepoCommands } from './commands/repo/index.js';
+import { registerRunCommands } from './commands/run/index.js';
+import { registerCompletionCommand } from './commands/completion.js';
 import { AzdError } from './errors/index.js';
 
 const program = new Command();
@@ -29,6 +32,9 @@ registerAuthCommands(program);
 registerIssueCommands(program);
 registerPrCommands(program);
 registerSearchCommands(program);
+registerRepoCommands(program);
+registerRunCommands(program);
+registerCompletionCommand(program);
 
 // Unknown command handler
 program.on('command:*', function (this: Command) {
