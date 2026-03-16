@@ -3,6 +3,7 @@ import { getWebApi } from '../../api/client.js';
 import { listPullRequests } from '../../api/pullRequests.js';
 import { getConfig } from '../../config/index.js';
 import { outputTable, outputJson, relativeDate, colorPrState, truncate } from '../../output/index.js';
+import chalk from 'chalk';
 
 async function prListHandler(options: {
   state?: string;
@@ -13,6 +14,7 @@ async function prListHandler(options: {
   org?: string;
   json?: string | boolean;
   web?: boolean;
+  draft?: string | boolean;
 }): Promise<void> {
   const config = getConfig({ orgUrl: options.org, project: options.project });
 
@@ -31,20 +33,33 @@ async function prListHandler(options: {
 
   const connection = await getWebApi(config.orgUrl);
 
-  const prs = await listPullRequests(connection, config.project, {
+  const draftMode = options.draft === 'only' ? 'only' : options.draft ? 'include' : 'exclude';
+  const limit = options.limit ? parseInt(options.limit, 10) : 30;
+
+  // When excluding drafts, fetch all (including drafts) so we can count hidden ones.
+  const allPrs = await listPullRequests(connection, config.project, {
     state: options.state,
     repo: options.repo,
     author: options.author,
-    limit: options.limit ? parseInt(options.limit, 10) : 30,
+    limit,
+    draft: draftMode === 'exclude' ? 'include' : draftMode,
   });
+
+  const prs = draftMode === 'exclude' ? allPrs.filter(pr => !pr.isDraft) : allPrs;
+  const hiddenDraftCount = draftMode === 'exclude' ? allPrs.length - prs.length : 0;
 
   if (options.json !== undefined) {
     outputJson(prs, typeof options.json === 'string' ? options.json : undefined);
     return;
   }
 
+  const hiddenDraftMsg = hiddenDraftCount > 0 ? chalk.dim(`Result contains ${hiddenDraftCount} hidden draft PR${hiddenDraftCount === 1 ? '' : 's'}. Use \`--draft\` to include or \`--draft only\` to filter.\n`) : '';
+
   if (prs.length === 0) {
     process.stdout.write('No pull requests found.\n');
+    if (hiddenDraftCount > 0) {
+      process.stderr.write(hiddenDraftMsg);
+    }
     return;
   }
 
@@ -60,6 +75,10 @@ async function prListHandler(options: {
       relativeDate(pr.updatedAt),
     ])
   );
+
+  if (hiddenDraftCount > 0) {
+    process.stderr.write(hiddenDraftMsg);
+  }
 }
 
 export function registerPrList(prCmd: Command): void {
@@ -74,5 +93,6 @@ export function registerPrList(prCmd: Command): void {
     .option('--org <url>', 'Azure DevOps organization URL (overrides config)')
     .option('--json [fields]', 'Output as JSON (optional comma-separated fields)')
     .option('-w, --web', 'Open in browser')
+    .option('--draft [only]', 'Include drafts (--draft) or show only drafts (--draft only)')
     .action(prListHandler);
 }

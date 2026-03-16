@@ -1,25 +1,23 @@
 {
   "name": "azd-cli",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Azure DevOps CLI for agents, mirroring GitHub CLI",
+  "main": "./dist/index.js",
   "bin": {
     "azd": "./dist/index.js"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
-    "compile": "tsc && pkg . --out-path bin",
     "dev": "ts-node src/index.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
   },
-  "pkg": {
-    "scripts": "dist/**/*.js",
-    "targets": [
-      "node18-win-x64",
-      "node18-linux-x64",
-      "node18-macos-x64"
-    ],
-    "outputPath": "bin"
-  },
+  "license": "MIT",
   "dependencies": {
     "@azure/msal-node": "^5.1.0",
     "azure-devops-node-api": "^15.1.2",
@@ -27,15 +25,16 @@
     "cli-table3": "^0.6.5",
     "commander": "^14.0.0",
     "diff": "^8.0.3",
-    "keytar": "^7.9.0",
     "minimatch": "^10.2.4",
     "open": "^8.4.2"
+  },
+  "optionalDependencies": {
+    "keytar": "^7.9.0"
   },
   "devDependencies": {
     "@types/diff": "^7.0.2",
     "@types/minimatch": "^5.1.2",
     "@types/node": "^22.0.0",
-    "@yao-pkg/pkg": "^5.15.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.8.0"
   },

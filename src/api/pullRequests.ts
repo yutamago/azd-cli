@@ -86,6 +86,7 @@ export async function listPullRequests(
     repo?: string;
     author?: string;
     limit?: number;
+    draft?: 'include' | 'exclude' | 'only';
   }
 ): Promise<PrSummary[]> {
   const gitApi = await connection.getGitApi();
@@ -117,6 +118,10 @@ export async function listPullRequests(
         const name = (pr.createdBy?.displayName ?? '').toLowerCase();
         return name.includes(authorLower);
       });
+    }
+
+    if (options.draft === 'only') {
+      results = results.filter(pr => pr.isDraft);
     }
 
     return results.slice(0, limit).map(pr => ({

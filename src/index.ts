@@ -20,13 +20,14 @@ import { registerRepoCommands } from './commands/repo/index.js';
 import { registerRunCommands } from './commands/run/index.js';
 import { registerCompletionCommand } from './commands/completion.js';
 import { AzdError } from './errors/index.js';
+import { version } from '../package.json';
 
 const program = new Command();
 
 program
   .name('azd')
   .description('Azure DevOps CLI — compatible with GitHub CLI conventions')
-  .version('0.1.0');
+  .version(version);
 
 registerAuthCommands(program);
 registerIssueCommands(program);
