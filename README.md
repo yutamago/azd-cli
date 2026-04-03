@@ -3,11 +3,27 @@ An Azure DevOps CLI, mimicking the known and loved Github CLI syntax.
 
 ## Installation
 
+**macOS, Linux, WSL** (recommended — no Node.js required):
+```bash
+curl -fsSL https://raw.githubusercontent.com/yutamago/ado-cli/main/install.sh | bash
+```
+
+**Windows PowerShell:**
+```powershell
+irm https://raw.githubusercontent.com/yutamago/ado-cli/main/install.ps1 | iex
+```
+
+**Windows CMD:**
+```cmd
+curl -fsSL https://raw.githubusercontent.com/yutamago/ado-cli/main/install.ps1 -o install.ps1 && powershell -File install.ps1 && del install.ps1
+```
+
+**npm** (requires Node.js 18+):
 ```bash
 npm install -g ado-cli
 ```
 
-**Prerequisites:** Node.js 18 or later, an Azure DevOps account.
+Pre-built binaries for all platforms are also available on the [Releases](https://github.com/yutamago/ado-cli/releases) page.
 
 
 ### Installing the Plugin in your AI Agent

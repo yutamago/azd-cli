@@ -16,17 +16,46 @@ description: >
 
 `azd` is an Azure DevOps CLI optimized for agentic use. It mirrors GitHub CLI (`gh`) conventions so commands map predictably. All commands are non-interactive by default; TTY output is styled tables, non-TTY output is tab-separated plain text (pipeline-safe). Use `--json` for structured JSON.
 
-## Availability Check
+## First Run: Detect Installation
 
-Before running any `azd` command, verify the tool is available:
+**Run this check once at the start of each session, before any other command.**
 
+Check for the `ado` binary in this order:
+
+1. **Plugin-local binary** — try `${CLAUDE_PLUGIN_ROOT}/bin/ado --version`
+2. **System PATH** — try `ado --version`
+
+If either succeeds, record that the CLI is available and proceed normally. Do **not** repeat the check for subsequent commands in the same session.
+
+If **both fail**, do NOT attempt to install it automatically. Stop and show the user this message:
+
+---
+
+**`ado-cli` is not installed.** Install it using one of these methods, then re-run your request:
+
+**macOS, Linux, WSL**
 ```bash
-ado --version
+curl -fsSL https://raw.githubusercontent.com/yutamago/ado-cli/main/install.sh | bash
 ```
 
-If the command is not found, do NOT attempt to install it. Instead, use AskUserQuestion (if available) to ask the user to install it, or inform them with a clear message:
+**Windows PowerShell**
+```powershell
+irm https://raw.githubusercontent.com/yutamago/ado-cli/main/install.ps1 | iex
+```
 
-> `azd` is not installed. Install it with: `npm install -g azd-cli`
+**Windows CMD**
+```cmd
+curl -fsSL https://raw.githubusercontent.com/yutamago/ado-cli/main/install.ps1 -o install.ps1 && powershell -File install.ps1 && del install.ps1
+```
+
+**npm** (requires Node.js 18+)
+```bash
+npm install -g ado-cli
+```
+
+---
+
+Once installed, run `ado --version` to confirm, then retry your original request.
 
 ## Authentication
 

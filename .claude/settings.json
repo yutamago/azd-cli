@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(json|yaml|yml|config\\)$\")",
+      "Bash(find * -name \"*\" -exec wc -l {} +)",
+      "Bash(bun install:*)"
+    ]
+  }
+}

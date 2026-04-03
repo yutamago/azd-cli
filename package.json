@@ -1,6 +1,6 @@
 {
   "name": "ado-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An Azure DevOps CLI, mimicking the known and loved Github CLI syntax.",
   "main": "./dist/index.js",
   "bin": {
@@ -12,10 +12,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "ts-node src/index.ts",
-    "start": "node dist/index.js",
-    "prepublishOnly": "npm run build"
+    "build": "bun build src/index.ts --target=node --outdir=dist --sourcemap=external",
+    "typecheck": "tsc --noEmit",
+    "dev": "bun src/index.ts",
+    "start": "bun dist/index.js",
+    "prepublishOnly": "bun run build"
   },
   "license": "MIT",
   "dependencies": {
@@ -34,10 +35,9 @@
     "@types/diff": "^7.0.2",
     "@types/minimatch": "^5.1.2",
     "@types/node": "^22.0.0",
-    "ts-node": "^10.9.0",
     "typescript": "^5.8.0"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "bun": ">=1.0.0"
   }
 }
