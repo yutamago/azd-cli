@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getConfigDir } from '../config/index.js';
 
-const KEYTAR_SERVICE = 'azd-cli';
+const KEYTAR_SERVICE = 'ado-cli';
 const KEYTAR_OAUTH_CACHE_ACCOUNT = '__oauth_cache__';
 
 const CREDENTIALS_FILE = path.join(getConfigDir(), 'credentials.json');

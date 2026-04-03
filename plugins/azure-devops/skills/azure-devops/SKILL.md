@@ -14,11 +14,11 @@ description: >
 
 # ado CLI Skill
 
-`azd` is an Azure DevOps CLI optimized for agentic use. It mirrors GitHub CLI (`gh`) conventions so commands map predictably. All commands are non-interactive by default; TTY output is styled tables, non-TTY output is tab-separated plain text (pipeline-safe). Use `--json` for structured JSON.
+`ado` is an Azure DevOps CLI optimized for agentic use. It mirrors GitHub CLI (`gh`) conventions so commands map predictably. All commands are non-interactive by default; TTY output is styled tables, non-TTY output is tab-separated plain text (pipeline-safe). Use `--json` for structured JSON.
 
-## First Run: Detect Installation
+## On Errors: Detect Installation
 
-**Run this check once at the start of each session, before any other command.**
+**Run this check once per session if the first `ado` command fails, before continuing with any other command.**
 
 Check for the `ado` binary in this order:
 
@@ -59,22 +59,15 @@ Once installed, run `ado --version` to confirm, then retry your original request
 
 ## Authentication
 
-Credential resolution order (highest to lowest priority):
-
-1. `SYSTEM_ACCESSTOKEN` env var — Azure Pipelines built-in token (CI)
-2. `AZURE_DEVOPS_TOKEN` env var — explicit PAT for scripts/CI
-3. Stored credential from `ado auth login` (OAuth token or PAT)
-
-### Login
-
+If the CLI returns an authentication error, prompt the user to run one of the following commands to log in:
 ```bash
 ado auth login                          # OAuth browser flow (default)
 ado auth login --with-token             # PAT via stdin: echo $PAT | ado auth login --with-token
 ado auth login --token <pat>            # PAT inline
-ado auth login --org <url>             # Specify org URL at login time
+ado auth login --org <url>              # Specify org URL at login time
 ```
 
-After login, select a default project interactively, or set env vars:
+After login, the CLI attempts to select a default project interactively, or set env vars:
 
 ```bash
 export AZURE_DEVOPS_ORG=https://dev.azure.com/myorg
@@ -89,7 +82,7 @@ ado auth status --json
 
 ## Configuration Resolution Order
 
-CLI flags → environment variables → git remote (auto-detect) → `~/.azd/config.json`
+CLI flags → environment variables → git remote (auto-detect) → `~/.ado/config.json`
 
 Git remote formats supported: `https://dev.azure.com/{org}/{project}/_git/{repo}`, `https://{org}.visualstudio.com/{project}/_git/{repo}`, `git@ssh.dev.azure.com:v3/{org}/{project}/{repo}`
 
@@ -232,4 +225,4 @@ ado repo clone my-repo ./local-dir
 
 For the complete flag inventory (every flag, short alias, default, and accepted values for every subcommand), read:
 
-`${CLAUDE_PLUGIN_ROOT}/skills/azd-cli/reference.md`
+`${CLAUDE_PLUGIN_ROOT}/skills/ado-cli/reference.md`

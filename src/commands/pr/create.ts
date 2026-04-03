@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
 import { createPullRequest, resolveRepo } from '../../api/pullRequests.js';
 import { getConfig } from '../../config/index.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 
 function promptLine(question: string): Promise<string> {
   return new Promise((resolve) => {
@@ -58,11 +58,11 @@ async function prCreateHandler(options: {
   let head = options.head ?? getCurrentBranch();
   if (!head) {
     if (!process.stdin.isTTY) {
-      throw new AzdError('Could not detect current branch. Use --head <branch>.');
+      throw new AdoError('Could not detect current branch. Use --head <branch>.');
     }
     head = await promptLine('Source branch (head): ');
   }
-  if (!head) throw new AzdError('Source branch is required. Use --head <branch>.');
+  if (!head) throw new AdoError('Source branch is required. Use --head <branch>.');
 
   // Resolve base branch
   let base = options.base ?? getDefaultBase() ?? 'main';
@@ -71,11 +71,11 @@ async function prCreateHandler(options: {
   let title = options.title;
   if (!title) {
     if (!process.stdin.isTTY) {
-      throw new AzdError('Title is required. Use -t/--title <title>.');
+      throw new AdoError('Title is required. Use -t/--title <title>.');
     }
     title = await promptLine('Title: ');
   }
-  if (!title) throw new AzdError('Title cannot be empty.');
+  if (!title) throw new AdoError('Title cannot be empty.');
 
   const reviewers = options.reviewer
     ? Array.isArray(options.reviewer)

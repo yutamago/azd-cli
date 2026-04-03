@@ -9,7 +9,7 @@ async function runRerunHandler(
 ): Promise<void> {
   const numId = parseInt(runId, 10);
   if (isNaN(numId)) {
-    process.stderr.write(`azd: invalid run ID: ${runId}\n`);
+    process.stderr.write(`ado: invalid run ID: ${runId}\n`);
     process.exit(1);
   }
 

@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ado: debug local (bun)",
+      "type": "bun",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/index.ts",
+      "args": [
+        "pr",
+        "list"
+      ],
+      "cwd": "/home/angelo/workspaces/stp_ws/Winsolvenz.Assist"
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
 import { patchWorkItem } from '../../api/workItems.js';
 import { getConfig } from '../../config/index.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 import { outputJson } from '../../output/index.js';
 
 async function issueEditHandler(
@@ -20,7 +20,7 @@ async function issueEditHandler(
 ): Promise<void> {
   const numId = parseInt(id, 10);
   if (isNaN(numId)) {
-    process.stderr.write(`azd: invalid work item ID: ${id}\n`);
+    process.stderr.write(`ado: invalid work item ID: ${id}\n`);
     process.exit(1);
   }
 
@@ -32,7 +32,7 @@ async function issueEditHandler(
   if (options.label !== undefined) fields['System.Tags'] = options.label;
 
   if (Object.keys(fields).length === 0) {
-    throw new AzdError('No fields to update. Specify at least one of: --title, --body, --state, --assignee, --label');
+    throw new AdoError('No fields to update. Specify at least one of: --title, --body, --state, --assignee, --label');
   }
 
   const config = getConfig({ orgUrl: options.org, project: options.project });

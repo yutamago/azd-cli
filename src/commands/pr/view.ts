@@ -10,7 +10,7 @@ async function prViewHandler(
 ): Promise<void> {
   const numId = parseInt(prId, 10);
   if (isNaN(numId)) {
-    process.stderr.write(`azd: invalid PR number: ${prId}\n`);
+    process.stderr.write(`ado: invalid PR number: ${prId}\n`);
     process.exit(1);
   }
 

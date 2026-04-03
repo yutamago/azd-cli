@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
 import { getWorkItem } from '../../api/workItems.js';
 import { getConfig } from '../../config/index.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 
 function sanitizeBranchName(title: string): string {
   return title
@@ -24,7 +24,7 @@ async function issueDevelopHandler(
 ): Promise<void> {
   const numId = parseInt(id, 10);
   if (isNaN(numId)) {
-    process.stderr.write(`azd: invalid work item ID: ${id}\n`);
+    process.stderr.write(`ado: invalid work item ID: ${id}\n`);
     process.exit(1);
   }
 
@@ -37,12 +37,12 @@ async function issueDevelopHandler(
   if (!repoName) {
     const repos = await gitApi.getRepositories(config.project);
     if (!repos || repos.length === 0) {
-      throw new AzdError(`No repositories found in project '${config.project}'.`);
+      throw new AdoError(`No repositories found in project '${config.project}'.`);
     }
     if (repos.length === 1) {
       repoName = repos[0].name!;
     } else {
-      throw new AzdError(
+      throw new AdoError(
         `Multiple repositories found. Specify one with --repo:\n` +
           repos.map((r) => `  ${r.name}`).join('\n'),
       );
@@ -67,15 +67,15 @@ async function issueDevelopHandler(
         const branchInfo = await gitApi.getBranch(repoName, 'master', config.project);
         baseSha = branchInfo.commit?.commitId;
       } catch {
-        throw new AzdError(`Base branch 'main' or 'master' not found. Specify one with --base.`);
+        throw new AdoError(`Base branch 'main' or 'master' not found. Specify one with --base.`);
       }
     } else {
-      throw new AzdError(`Base branch '${baseBranch}' not found.`);
+      throw new AdoError(`Base branch '${baseBranch}' not found.`);
     }
   }
 
   if (!baseSha) {
-    throw new AzdError(`Could not resolve commit for base branch.`);
+    throw new AdoError(`Could not resolve commit for base branch.`);
   }
 
   // Create the branch

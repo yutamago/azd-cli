@@ -6,12 +6,12 @@ import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
 import { addWorkItemComment } from '../../api/workItems.js';
 import { getConfig } from '../../config/index.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 
 function openEditor(initial = ''): string {
   const editor =
     process.env['VISUAL'] ?? process.env['EDITOR'] ?? (process.platform === 'win32' ? 'notepad' : 'vi');
-  const tmpFile = path.join(os.tmpdir(), `azd-issue-comment-${Date.now()}.md`);
+  const tmpFile = path.join(os.tmpdir(), `ado-issue-comment-${Date.now()}.md`);
   fs.writeFileSync(tmpFile, initial, 'utf8');
 
   try {
@@ -31,7 +31,7 @@ async function issueCommentHandler(
 ): Promise<void> {
   const numId = parseInt(id, 10);
   if (isNaN(numId)) {
-    process.stderr.write(`azd: invalid work item ID: ${id}\n`);
+    process.stderr.write(`ado: invalid work item ID: ${id}\n`);
     process.exit(1);
   }
 
@@ -41,7 +41,7 @@ async function issueCommentHandler(
   }
 
   if (!body) {
-    throw new AzdError('Comment body cannot be empty.');
+    throw new AdoError('Comment body cannot be empty.');
   }
 
   const config = getConfig({ orgUrl: options.org, project: options.project });

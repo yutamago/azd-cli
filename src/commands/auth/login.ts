@@ -3,7 +3,7 @@ import * as readline from 'readline';
 import { savePatToken, saveOAuthCredential } from '../../auth/store.js';
 import { loginBrowser, loginDeviceCode } from '../../auth/oauth.js';
 import { saveConfigFile } from '../../config/index.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 import { registerAuthStatus } from './status.js';
 import { registerAuthLogout } from './logout.js';
 
@@ -56,9 +56,9 @@ async function validateAndSave(
         ? (err as { statusCode: number }).statusCode
         : 0;
     if (status === 401 || status === 203) {
-      throw new AzdError('Authentication failed: invalid or expired token.');
+      throw new AdoError('Authentication failed: invalid or expired token.');
     }
-    throw new AzdError(
+    throw new AdoError(
       `Failed to connect to ${orgUrl}: ${err instanceof Error ? err.message : String(err)}`,
     );
   }
@@ -155,7 +155,7 @@ async function patLogin(orgUrl: string, token: string | undefined, project?: str
   }
 
   pat = pat.trim();
-  if (!pat) throw new AzdError('No token provided.');
+  if (!pat) throw new AdoError('No token provided.');
 
   await validateAndSave(orgUrl, pat, 'pat', project);
 }
@@ -173,7 +173,7 @@ async function loginHandler(options: {
   if (!orgUrl) {
     if (!process.stdin.isTTY && !options.withToken) {
       // Non-interactive and no --with-token: can't prompt for org URL
-      throw new AzdError(
+      throw new AdoError(
         'No organization URL provided. Use --org <url> or set AZURE_DEVOPS_ORG.',
       );
     }

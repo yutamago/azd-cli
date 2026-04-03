@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
 import { createWorkItem } from '../../api/workItems.js';
 import { getConfig } from '../../config/index.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 import { outputJson } from '../../output/index.js';
 
 async function issueCreateHandler(options: {
@@ -16,7 +16,7 @@ async function issueCreateHandler(options: {
   json?: string | boolean;
 }): Promise<void> {
   if (!options.title) {
-    throw new AzdError('Title is required. Use -t/--title <title>');
+    throw new AdoError('Title is required. Use -t/--title <title>');
   }
 
   const config = getConfig({ orgUrl: options.org, project: options.project });

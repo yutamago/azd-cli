@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
 import { reviewPullRequest, resolveRepo } from '../../api/pullRequests.js';
 import { getConfig } from '../../config/index.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 
 async function prReviewHandler(
   prId: string,
@@ -18,17 +18,17 @@ async function prReviewHandler(
 ): Promise<void> {
   const numId = parseInt(prId, 10);
   if (isNaN(numId)) {
-    process.stderr.write(`azd: invalid PR number: ${prId}\n`);
+    process.stderr.write(`ado: invalid PR number: ${prId}\n`);
     process.exit(1);
   }
 
   // Exactly one action must be provided
   const actions = [options.approve, options.reject, options.requestChanges].filter(Boolean);
   if (actions.length === 0) {
-    throw new AzdError('Specify one of: --approve, --reject, --request-changes');
+    throw new AdoError('Specify one of: --approve, --reject, --request-changes');
   }
   if (actions.length > 1) {
-    throw new AzdError('Specify only one of: --approve, --reject, --request-changes');
+    throw new AdoError('Specify only one of: --approve, --reject, --request-changes');
   }
 
   // Vote values (Azure DevOps): 10=Approved, -10=Rejected, -5=Waiting for author

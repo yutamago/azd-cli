@@ -3,14 +3,14 @@ import * as path from 'path';
 import { Command } from 'commander';
 import { getOrgUrl, getConfigDir, loadConfigFile } from '../../config/index.js';
 import { deleteCredential } from '../../auth/store.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 
 async function authLogoutHandler(options: { org?: string }): Promise<void> {
   let orgUrl: string;
   try {
     orgUrl = getOrgUrl(options.org);
   } catch {
-    throw new AzdError('Not authenticated. Run: ado auth login');
+    throw new AdoError('Not authenticated. Run: ado auth login');
   }
 
   await deleteCredential(orgUrl);

@@ -26,7 +26,7 @@ function bashCompletion(): string {
     .map(([cmd, subs]) => `    ${cmd}) COMPREPLY=($(compgen -W "${subs}" -- "$cur")) ;;`)
     .join('\n');
 
-  return `# bash completion for azd
+  return `# bash completion for ado
 # Add to your ~/.bashrc:
 #   source <(ado completion -s bash)
 
@@ -46,7 +46,7 @@ ${cases}
   esac
 }
 
-complete -F _azd_completion azd
+complete -F _azd_completion ado
 `;
 }
 
@@ -55,8 +55,8 @@ function zshCompletion(): string {
     .map(([cmd, subs]) => `      ${cmd}) _values 'subcommand' ${subs} ;;`)
     .join('\n');
 
-  return `#compdef azd
-# zsh completion for azd
+  return `#compdef ado
+# zsh completion for ado
 # Add to your ~/.zshrc:
 #   source <(ado completion -s zsh)
 
@@ -80,8 +80,8 @@ _ado "$@"
 
 function fishCompletion(): string {
   const lines: string[] = [
-    `# fish completion for azd`,
-    `# Save to ~/.config/fish/completions/azd.fish`,
+    `# fish completion for ado`,
+    `# Save to ~/.config/fish/completions/ado.fish`,
     ``,
   ];
 
@@ -118,7 +118,7 @@ function powershellCompletion(): string {
     )
     .join('\n');
 
-  return `# PowerShell completion for azd
+  return `# PowerShell completion for ado
 # Add to your $PROFILE:
 #   ado completion -s powershell | Out-String | Invoke-Expression
 

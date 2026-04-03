@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
 import { getConfig } from '../../config/index.js';
-import { AzdError, handleApiError } from '../../errors/index.js';
+import { AdoError, handleApiError } from '../../errors/index.js';
 
 async function streamToFile(stream: NodeJS.ReadableStream, filePath: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ async function runDownloadHandler(
 ): Promise<void> {
   const numId = parseInt(runId, 10);
   if (isNaN(numId)) {
-    process.stderr.write(`azd: invalid run ID: ${runId}\n`);
+    process.stderr.write(`ado: invalid run ID: ${runId}\n`);
     process.exit(1);
   }
 
@@ -44,7 +44,7 @@ async function runDownloadHandler(
       : artifacts;
 
     if (toDownload.length === 0) {
-      throw new AzdError(`Artifact '${options.name}' not found in run #${numId}`);
+      throw new AdoError(`Artifact '${options.name}' not found in run #${numId}`);
     }
 
     for (const artifact of toDownload) {

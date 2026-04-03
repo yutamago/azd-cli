@@ -2,7 +2,7 @@ import * as child_process from 'child_process';
 import { Command } from 'commander';
 import { getWebApi } from '../../api/client.js';
 import { getConfig } from '../../config/index.js';
-import { AzdError } from '../../errors/index.js';
+import { AdoError } from '../../errors/index.js';
 
 async function repoCloneHandler(
   repo: string,
@@ -15,7 +15,7 @@ async function repoCloneHandler(
 
   const repoInfo = await gitApi.getRepository(repo, config.project);
   const remoteUrl = repoInfo.remoteUrl;
-  if (!remoteUrl) throw new AzdError(`Repository '${repo}' has no remote URL.`);
+  if (!remoteUrl) throw new AdoError(`Repository '${repo}' has no remote URL.`);
 
   const args = ['clone', remoteUrl];
   if (directory) args.push(directory);
@@ -23,9 +23,9 @@ async function repoCloneHandler(
   await new Promise<void>((resolve, reject) => {
     const proc = child_process.spawn('git', args, { stdio: 'inherit' });
     proc.on('close', (code) =>
-      code === 0 ? resolve() : reject(new AzdError(`git clone failed with exit code ${code}`)),
+      code === 0 ? resolve() : reject(new AdoError(`git clone failed with exit code ${code}`)),
     );
-    proc.on('error', (err) => reject(new AzdError(`Failed to run git: ${err.message}`)));
+    proc.on('error', (err) => reject(new AdoError(`Failed to run git: ${err.message}`)));
   });
 }
 

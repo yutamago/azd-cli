@@ -6,7 +6,7 @@ import {
 import { createTwoFilesPatch } from 'diff';
 import { minimatch } from 'minimatch';
 import { handleApiError } from '../errors/index.js';
-import { AzdError } from '../errors/index.js';
+import { AdoError } from '../errors/index.js';
 
 export interface PrSummary {
   id: number;
@@ -282,7 +282,7 @@ export async function getPrDiff(
     const targetCommit = pr.lastMergeTargetCommit?.commitId;
 
     if (!sourceCommit || !targetCommit) {
-      throw new AzdError('PR does not have committed changes yet.');
+      throw new AdoError('PR does not have committed changes yet.');
     }
 
     // Get changed files from the latest iteration
@@ -415,7 +415,7 @@ export async function reviewPullRequest(
     const connData = await connection.connect();
     const userId = connData?.authenticatedUser?.id;
     if (!userId) {
-      throw new AzdError('Could not determine current user identity.');
+      throw new AdoError('Could not determine current user identity.');
     }
 
     await gitApi.createPullRequestReviewer(
@@ -441,13 +441,13 @@ export async function resolveRepo(
   const repos = await gitApi.getRepositories(project);
 
   if (!repos || repos.length === 0) {
-    throw new AzdError(`No repositories found in project '${project}'.`);
+    throw new AdoError(`No repositories found in project '${project}'.`);
   }
   if (repos.length === 1) {
     return repos[0].name ?? '';
   }
 
-  throw new AzdError(
+  throw new AdoError(
     `Multiple repositories found. Specify one with --repo:\n` +
     repos.map(r => `  ${r.name}`).join('\n')
   );

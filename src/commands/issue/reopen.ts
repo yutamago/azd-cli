@@ -9,7 +9,7 @@ async function issueReopenHandler(
 ): Promise<void> {
   const numId = parseInt(id, 10);
   if (isNaN(numId)) {
-    process.stderr.write(`azd: invalid work item ID: ${id}\n`);
+    process.stderr.write(`ado: invalid work item ID: ${id}\n`);
     process.exit(1);
   }
 

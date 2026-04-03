@@ -19,13 +19,13 @@ import { registerSearchCommands } from './commands/search/index.js';
 import { registerRepoCommands } from './commands/repo/index.js';
 import { registerRunCommands } from './commands/run/index.js';
 import { registerCompletionCommand } from './commands/completion.js';
-import { AzdError } from './errors/index.js';
+import { AdoError } from './errors/index.js';
 import { version } from '../package.json';
 
 const program = new Command();
 
 program
-  .name('azd')
+  .name('ado')
   .description('Azure DevOps CLI — compatible with GitHub CLI conventions')
   .version(version);
 
@@ -41,31 +41,31 @@ registerCompletionCommand(program);
 program.on('command:*', function (this: Command) {
   const args = (this as unknown as { args: string[] }).args;
   process.stderr.write(
-    `azd: '${args.join(' ')}' is not a valid command.\nSee 'ado --help' for available commands.\n`
+    `ado: '${args.join(' ')}' is not a valid command.\nSee 'ado --help' for available commands.\n`
   );
   process.exit(1);
 });
 
 // Global error handler
 process.on('unhandledRejection', (reason: unknown) => {
-  if (reason instanceof AzdError) {
-    process.stderr.write(`azd: ${reason.message}\n`);
+  if (reason instanceof AdoError) {
+    process.stderr.write(`ado: ${reason.message}\n`);
     process.exit(reason.exitCode);
   } else if (reason instanceof Error) {
-    process.stderr.write(`azd: ${reason.message}\n`);
+    process.stderr.write(`ado: ${reason.message}\n`);
     process.exit(1);
   } else {
-    process.stderr.write(`azd: unexpected error: ${String(reason)}\n`);
+    process.stderr.write(`ado: unexpected error: ${String(reason)}\n`);
     process.exit(1);
   }
 });
 
 program.parseAsync(process.argv).catch((err: unknown) => {
-  if (err instanceof AzdError) {
-    process.stderr.write(`azd: ${err.message}\n`);
+  if (err instanceof AdoError) {
+    process.stderr.write(`ado: ${err.message}\n`);
     process.exit(err.exitCode);
   } else if (err instanceof Error) {
-    process.stderr.write(`azd: ${err.message}\n`);
+    process.stderr.write(`ado: ${err.message}\n`);
     process.exit(1);
   }
 });

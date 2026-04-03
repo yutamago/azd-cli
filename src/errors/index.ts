@@ -1,25 +1,25 @@
-export class AzdError extends Error {
+export class AdoError extends Error {
   constructor(message: string, public exitCode: number = 1) {
     super(message);
-    this.name = 'AzdError';
+    this.name = 'AdoError';
   }
 }
 
-export class AuthError extends AzdError {
+export class AuthError extends AdoError {
   constructor(message = 'Not authenticated. Run: ado auth login') {
     super(message, 1);
     this.name = 'AuthError';
   }
 }
 
-export class NotFoundError extends AzdError {
+export class NotFoundError extends AdoError {
   constructor(resource: string, id: string | number) {
     super(`${resource} #${id} not found`, 1);
     this.name = 'NotFoundError';
   }
 }
 
-export class ConfigError extends AzdError {
+export class ConfigError extends AdoError {
   constructor(message: string) {
     super(message, 1);
     this.name = 'ConfigError';
@@ -33,23 +33,23 @@ export function handleApiError(err: unknown, resource?: string): never {
       throw new AuthError('Token expired or invalid. Run: ado auth login');
     }
     if (status === 403) {
-      throw new AzdError('Insufficient permissions for this operation');
+      throw new AdoError('Insufficient permissions for this operation');
     }
     if (status === 404) {
-      throw new AzdError(resource ? `${resource} not found` : 'Resource not found');
+      throw new AdoError(resource ? `${resource} not found` : 'Resource not found');
     }
     if (status === 429) {
       const retryAfter = (err as Record<string, unknown>).retryAfter ?? '60';
-      throw new AzdError(`Rate limited. Retry after ${retryAfter}s`);
+      throw new AdoError(`Rate limited. Retry after ${retryAfter}s`);
     }
   }
-  throw err instanceof Error ? err : new AzdError(String(err));
+  throw err instanceof Error ? err : new AdoError(String(err));
 }
 
 export function handleUnknownCommand(this: import('commander').Command): void {
   const args = this.args;
   process.stderr.write(
-    `azd: '${args.join(' ')}' is not a valid command.\nSee 'ado --help' for available commands.\n`
+    `ado: '${args.join(' ')}' is not a valid command.\nSee 'ado --help' for available commands.\n`
   );
   process.exit(1);
 }

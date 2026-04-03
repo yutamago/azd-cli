@@ -122,7 +122,7 @@ ado repo clone <repo>
 ```bash
 ado completion bash        >> ~/.bashrc
 ado completion zsh         >> ~/.zshrc
-ado completion fish        > ~/.config/fish/completions/azd.fish
+ado completion fish        > ~/.config/fish/completions/ado.fish
 ado completion powershell  >> $PROFILE
 ```
 
@@ -146,7 +146,7 @@ Config is resolved in this order:
 1. CLI flags (`--org`, `--project`)
 2. Environment variables (`AZURE_DEVOPS_ORG`, `AZURE_DEVOPS_PROJECT`)
 3. Git remote (auto-detected from `origin`)
-4. `~/.azd/config.json`
+4. `~/.ado/config.json`
 
 Supported remote URL formats:
 

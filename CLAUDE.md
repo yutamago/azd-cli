@@ -21,7 +21,7 @@ src/
     builds.ts            # Pipeline run list/view/cancel/rerun/download/delete
     search.ts            # Code (Azure Search REST), commits, repos (client-side filter)
   auth/
-    store.ts             # Keytar + ~/.azd/credentials.json fallback
+    store.ts             # Keytar + ~/.ado/credentials.json fallback
     oauth.ts             # MSAL OAuth2 (browser + device-code flows)
   commands/
     auth/                # login, logout, status
@@ -31,9 +31,9 @@ src/
     search/              # issues, code, commits, prs, repos, projects
     repo/                # list, clone
     completion.ts        # Shell completions (bash/zsh/fish/powershell)
-  config/index.ts        # Config load: CLI > env > git remote > ~/.azd/config.json
+  config/index.ts        # Config load: CLI > env > git remote > ~/.ado/config.json
   output/index.ts        # TTY/non-TTY formatting, table, detail, JSON
-  errors/index.ts        # AzdError, AuthError, NotFoundError, ConfigError
+  errors/index.ts        # AdoError, AuthError, NotFoundError, ConfigError
 ```
 
 ## Authentication Architecture
@@ -43,13 +43,13 @@ Credential resolution order in `src/api/client.ts`:
 2. `AZURE_DEVOPS_TOKEN` env var — explicit PAT for scripts/CI
 3. Stored credential (OAuth token or PAT) — persisted across sessions
 
-OAuth uses MSAL `PublicClientApplication` with browser redirect (loopback), falling back to device-code for headless environments. Tokens are stored via keytar (native credential manager) with `~/.azd/credentials.json` as a file fallback.
+OAuth uses MSAL `PublicClientApplication` with browser redirect (loopback), falling back to device-code for headless environments. Tokens are stored via keytar (native credential manager) with `~/.ado/credentials.json` as a file fallback.
 
-Config location: `~/.azd/` (`config.json`, `credentials.json`, `oauth-cache.json`)
+Config location: `~/.ado/` (`config.json`, `credentials.json`, `oauth-cache.json`)
 
 ## Configuration Resolution Order
 
-CLI flags → environment variables → git remote (auto-detect org/project) → `~/.azd/config.json`
+CLI flags → environment variables → git remote (auto-detect org/project) → `~/.ado/config.json`
 
 Environment variables: `AZURE_DEVOPS_TOKEN`, `SYSTEM_ACCESSTOKEN`, `AZURE_DEVOPS_ORG`, `AZURE_DEVOPS_PROJECT`
 
@@ -73,7 +73,7 @@ Git remote formats supported:
 
 ## Keeping the Plugin Reference Up to Date
 
-`plugins/azd/skills/azd-cli/reference.md` is the authoritative CLI reference used by the ado plugin skill.
+`plugins/ado/skills/ado-cli/reference.md` is the authoritative CLI reference used by the ado plugin skill.
 
 **Update it whenever you:**
 - Add, rename, or remove a command or subcommand
@@ -86,7 +86,7 @@ Keep the reference in sync with the source — it is generated from the actual `
 
 ## Core Principles
 
-- `azd` commands should work the same as their `gh` counterparts, unless the Azure DevOps API makes this impossible.
+- `ado` commands should work the same as their `gh` counterparts, unless the Azure DevOps API makes this impossible.
 - If the user uses an unrecognized command, return a clear message explaining the wrong usage and how to properly use the command.
 - The core target audience for this CLI is Agents (such as Claude and GitHub Copilot).
 
