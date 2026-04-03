@@ -55,8 +55,6 @@ export function getRemoteContext(): RemoteContext {
     remoteContextCache = parseAdoRemoteUrl(remoteUrl) ?? {};
     return remoteContextCache;
   } catch(e) {
-    console.error(`Failed to get git remote URL from directory ${process.cwd()}: ${(e as Error).message}`);
-
     return {};
   }
 }
