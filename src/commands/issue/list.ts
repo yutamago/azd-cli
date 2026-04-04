@@ -12,15 +12,13 @@ async function getIterationPathByOptions(connection: WebApi, project: string, it
     return undefined;
   }
 
+  const originalIteration = iteration;
   iteration = iteration.toLowerCase();
 
   if (iteration === 'all') {
     return undefined;
   }
 
-  if (iteration !== 'current' && iteration !== 'next') {
-    return iteration;
-  }
 
 
   const myTeams = await getTeams(connection, project, { mine: true });
@@ -31,6 +29,15 @@ async function getIterationPathByOptions(connection: WebApi, project: string, it
   }
 
   const team = myTeams[0].name!;
+  const allIterations = await getTeamIterations(connection, project, team, {});
+
+  if (iteration !== 'current' && iteration !== 'next') {
+
+    const matched = allIterations.find(i => i.name?.toLowerCase() === iteration || i.path?.toLowerCase() === iteration);
+    return matched?.path ?? originalIteration;
+  }
+
+
   const iterations = await getTeamIterations(connection, project, team, { current: true });
 
   if (iterations.length === 0) {
@@ -44,7 +51,6 @@ async function getIterationPathByOptions(connection: WebApi, project: string, it
   }
 
   if (iteration === 'next') {
-    const allIterations = await getTeamIterations(connection, project, team, {});
     const currentIndex = allIterations.findIndex(i => i.id === currentIteration.id);
 
     if (currentIndex === -1 || currentIndex === allIterations.length - 1) {

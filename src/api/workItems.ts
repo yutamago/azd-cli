@@ -175,7 +175,7 @@ export async function listWorkItems(
   }
 
   if (options.iterationPath) {
-    conditions.push(`[System.IterationPath] CONTAINS '${options.iterationPath.replace(/'/g, "''")}'`);
+    conditions.push(`[System.IterationPath] = '${options.iterationPath.replace(/'/g, "''")}'`);
   }
 
   const wiql = {
