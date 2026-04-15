@@ -218,20 +218,28 @@ export async function getPullRequest(
   }
 }
 
-export async function addPrComment(
+export async function createPrThread(
   connection: azdev.WebApi,
   project: string,
   repoName: string,
   prId: number,
-  body: string
+  body: string,
+  fileContext?: { file: string; lineStart: number; lineEnd: number }
 ): Promise<void> {
   const gitApi = await connection.getGitApi();
+
+  const threadContext = fileContext ? {
+    filePath: fileContext.file,
+    rightFileStart: { line: fileContext.lineStart, offset: 1 },
+    rightFileEnd: { line: fileContext.lineEnd, offset: 1 },
+  } : undefined;
 
   try {
     await gitApi.createThread(
       {
         comments: [{ content: body, commentType: 1 }],
         status: 1, // Active
+        threadContext,
       },
       repoName,
       prId,

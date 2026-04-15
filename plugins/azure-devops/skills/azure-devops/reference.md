@@ -143,12 +143,16 @@ Generated from source at `src/commands/**/*.ts`. Update this file whenever a com
 | `--json [fields]` | — | Output as JSON | — |
 | `--web` | `-w` | Open in browser | — |
 
-## ado pr comment \<id\>
+## ado pr thread create \<pr-number\>
+
+Create a new comment thread on a pull request. Optionally anchor the thread to a specific file and line range in the diff (targets the right/head side).
 
 | Flag | Short | Description | Default |
 |------|-------|-------------|---------|
-| `--body <text>` | `-b` | Comment body | — |
-| `--editor` | — | Open `$EDITOR` to write the comment | — |
+| `--body <text>` | `-b` | Thread body | — |
+| `--editor` | — | Open `$EDITOR` to write the thread body | — |
+| `--file <path>` | — | File path to anchor the thread (relative to repo root) | — |
+| `--line <n[-n]>` | — | Line number or range, e.g. `42` or `42-55`; requires `--file` | — |
 | `--repo <repo>` | `-r` | Repository name | — |
 | `--project <project>` | `-p` | Azure DevOps project | — |
 | `--org <url>` | — | Organization URL | — |

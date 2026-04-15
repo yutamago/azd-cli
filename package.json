@@ -1,6 +1,6 @@
 {
   "name": "ado-cli",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "An Azure DevOps CLI, mimicking the known and loved Github CLI syntax.",
   "main": "./dist/index.js",
   "bin": {

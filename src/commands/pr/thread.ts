@@ -4,7 +4,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as child_process from 'child_process';
 import { getWebApi } from '../../api/client.js';
-import { replyToThread, setThreadStatus, resolveRepo } from '../../api/pullRequests.js';
+import { createPrThread, replyToThread, setThreadStatus, resolveRepo } from '../../api/pullRequests.js';
 import { getConfig } from '../../config/index.js';
 import { AdoError } from '../../errors/index.js';
 
@@ -22,6 +22,60 @@ function openEditor(initial = ''): string {
   const content = fs.readFileSync(tmpFile, 'utf8').trim();
   fs.unlinkSync(tmpFile);
   return content;
+}
+
+async function prThreadCreateHandler(
+  prId: string,
+  options: { body?: string; editor?: boolean; file?: string; line?: string; repo?: string; project?: string; org?: string }
+): Promise<void> {
+  const numId = parseInt(prId, 10);
+  if (isNaN(numId)) {
+    process.stderr.write(`ado: invalid PR number: ${prId}\n`);
+    process.exit(1);
+  }
+
+  if (options.line && !options.file) {
+    process.stderr.write('ado: --line requires --file\n');
+    process.exit(1);
+  }
+
+  let body = options.body;
+  if (!body || options.editor) {
+    body = openEditor(body ?? '');
+  }
+  if (!body) {
+    throw new AdoError('Thread body cannot be empty.');
+  }
+
+  let fileContext: { file: string; lineStart: number; lineEnd: number } | undefined;
+  if (options.file) {
+    let lineStart = 1;
+    let lineEnd = 1;
+    if (options.line) {
+      const match = options.line.match(/^(\d+)(?:-(\d+))?$/);
+      if (!match) {
+        process.stderr.write(`ado: invalid --line value: ${options.line}  (use N or N-M)\n`);
+        process.exit(1);
+      }
+      lineStart = parseInt(match[1], 10);
+      lineEnd = match[2] !== undefined ? parseInt(match[2], 10) : lineStart;
+      if (lineEnd < lineStart) {
+        process.stderr.write('ado: --line end must be >= start\n');
+        process.exit(1);
+      }
+    }
+    fileContext = { file: options.file, lineStart, lineEnd };
+  }
+
+  const config = getConfig({ orgUrl: options.org, project: options.project });
+  const connection = await getWebApi(config.orgUrl);
+  const repoName = await resolveRepo(connection, config.project, options.repo);
+
+  await createPrThread(connection, config.project, repoName, numId, body, fileContext);
+  const location = fileContext
+    ? ` on ${fileContext.file}:${fileContext.lineStart}${fileContext.lineEnd !== fileContext.lineStart ? `-${fileContext.lineEnd}` : ''}`
+    : '';
+  process.stdout.write(`Created thread on PR #${numId}${location}\n`);
 }
 
 async function prThreadReplyHandler(
@@ -115,6 +169,18 @@ export function registerPrThread(prCmd: Command): void {
   const thread = prCmd
     .command('thread')
     .description('Manage pull request comment threads');
+
+  thread
+    .command('create <pr-number>')
+    .description('Create a new comment thread on a pull request')
+    .option('-b, --body <text>', 'Thread body')
+    .option('--editor', 'Open $EDITOR to write the thread body')
+    .option('--file <path>', 'File path to anchor the thread to (relative to repo root)')
+    .option('--line <n[-n]>', 'Line number or range (e.g. 42 or 42-55); requires --file')
+    .option('-r, --repo <repo>', 'Repository name')
+    .option('-p, --project <project>', 'Azure DevOps project (overrides config)')
+    .option('--org <url>', 'Azure DevOps organization URL (overrides config)')
+    .action(prThreadCreateHandler);
 
   thread
     .command('reply <pr-number> <thread-id>')

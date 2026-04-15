@@ -85,7 +85,11 @@ ado pr view <pr>
 ado pr view <pr> --comments
 ado pr diff <pr>
 ado pr diff <pr> --name-only
-ado pr comment <pr> --body "Looks good"
+ado pr thread create <pr> --body "Looks good to me"
+ado pr thread create <pr> --file src/api/client.ts --line 42 --body "This could be simplified"
+ado pr thread create <pr> --file src/api/client.ts --line 42-55 --body "Consider extracting this block"
+ado pr thread reply <pr> <thread-id> --body "Fixed in latest commit"
+ado pr thread status <pr> <thread-id> --resolve
 ado pr create --title "My PR" --draft
 ado pr review <pr> --approve
 ado pr review <pr> --reject --comment "Needs changes"

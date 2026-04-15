@@ -10,7 +10,7 @@
 - [x] `ado issue view <id>` — work item detail view with optional comments
 - [x] `ado pr list` — list PRs with state/author/repo filters
 - [x] `ado pr view <pr>` — PR detail with optional comment threads
-- [x] `ado pr comment <pr>` — add comment (--body or $EDITOR)
+- [x] `ado pr thread create <pr>` — create a new comment thread (--body or $EDITOR; optionally anchored to --file + --line range)
 - [x] `ado pr diff <pr>` — real unified diff with `--color`, `--exclude`, `--name-only`, `--patch`, `--web` flags matching `gh pr diff`
 - [x] OAuth browser login as default auth (MSAL `acquireTokenInteractive`); device code flow for headless/CI
 - [x] DEP0169 deprecation warning suppression (upstream: azure-devops-node-api#664, fix: PR#662)
