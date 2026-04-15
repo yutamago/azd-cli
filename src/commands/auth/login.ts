@@ -193,6 +193,10 @@ async function loginHandler(options: {
   } else {
     await oauthLogin(orgUrl, project);
   }
+
+  // MSAL's acquireTokenInteractive starts a loopback HTTP server that may linger
+  // as an open handle, preventing the Node.js event loop from draining.
+  process.exit(0);
 }
 
 // ─── Registration ─────────────────────────────────────────────────────────────
